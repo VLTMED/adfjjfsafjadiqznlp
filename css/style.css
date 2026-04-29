@@ -1,0 +1,161 @@
+/* =========================================
+   التصميم الأساسي والمتغيرات
+========================================= */
+:root {
+    --primary-color: #005b96;
+    --secondary-color: #03396c;
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #dddddd;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* =========================================
+   الرأس والتذييل (Header & Footer)
+========================================= */
+.app-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.app-header h1 { font-size: 24px; margin-bottom: 5px; }
+.app-header p { font-size: 14px; opacity: 0.9; }
+
+.app-footer {
+    text-align: center;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    color: white;
+    font-size: 12px;
+    margin-top: 40px;
+}
+
+/* =========================================
+   تخطيط الصفحة (Grid Layout)
+========================================= */
+.app-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* المدخلات تأخذ مساحة أكبر من النتائج */
+    gap: 20px;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* =========================================
+   البطاقات وحقول الإدخال
+========================================= */
+.card {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    color: var(--primary-color);
+    font-size: 18px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.input-group input, .input-group select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* =========================================
+   لوحة النتائج والأزرار
+========================================= */
+.sticky-card {
+    position: sticky;
+    top: 20px;
+}
+
+.results-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+}
+
+.total-heat { font-weight: bold; font-size: 18px; color: var(--secondary-color); }
+.final-capacity { font-weight: bold; font-size: 20px; color: #d9534f; margin-top: 10px; }
+
+.student-info { margin-top: 20px; }
+.student-info input { width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;}
+
+button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 15px;
+}
+
+.btn-primary { background-color: var(--primary-color); color: white; }
+.btn-primary:hover { background-color: var(--secondary-color); }
+.btn-secondary { background-color: #28a745; color: white; }
+.btn-secondary:hover { background-color: #218838; }
+
+/* =========================================
+   تصميم الجوال والطباعة
+========================================= */
+@media (max-width: 768px) {
+    .app-container { grid-template-columns: 1fr; } /* الجوال يعرض عمود واحد */
+}
+
+@media print {
+    body { background-color: white; }
+    .no-print, .app-header, .app-footer, .btn-secondary { display: none !important; }
+    .app-container { display: block; margin: 0; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #000; }
+}
