@@ -49,7 +49,25 @@
                 </div>
             </div>
 
-            <!-- ملاحظة: سنضيف باقي حقول الإدخال (الجدران، الزجاج، المنتجات) لاحقاً في المرحلة القادمة لتجنب زحمة الكود الآن -->
+            <!-- قسم مواد البناء والعزل -->
+            <div class="card">
+                <h2>2. سمك طبقات السقف والجدران (بالمتر)</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>الخرسانة</label>
+                        <input type="number" id="thk-concrete" value="0.2" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>العازل (بوليستيرين)</label>
+                        <input type="number" id="thk-insulation" value="0.05" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label>مونة أسمنتية</label>
+                        <input type="number" id="thk-cement" value="0.02" step="0.01">
+                    </div>
+                </div>
+            </div>
+
             <button id="calculate-btn" class="btn-primary">احسب الأحمال ⚙️</button>
         </section>
 

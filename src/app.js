@@ -1,59 +1,66 @@
 // ==========================================
 // ملف الربط الديناميكي (Controller)
-// يربط واجهة المستخدم (HTML) بملف المعادلات (calculator.js)
 // ==========================================
 
-// ننتظر حتى يتم تحميل صفحة HTML بالكامل
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ربط زر "احسب الأحمال" المتواجد في HTML
     const calculateBtn = document.getElementById('calculate-btn');
 
-    // عندما يقوم المستخدم بالضغط على الزر، نفذ الآتي:
     calculateBtn.addEventListener('click', () => {
         
-        // 1. جلب الأرقام التي أدخلها المستخدم
-        const L = parseFloat(document.getElementById('room-length').value);
-        const W = parseFloat(document.getElementById('room-width').value);
-        const H = parseFloat(document.getElementById('room-height').value);
-        const tIn = parseFloat(document.getElementById('temp-in').value);
-        const tOut = parseFloat(document.getElementById('temp-out').value);
+        // 1. جلب الأبعاد والحرارة
+        const L = parseFloat(document.getElementById('room-length').value) || 0;
+        const W = parseFloat(document.getElementById('room-width').value) || 0;
+        const H = parseFloat(document.getElementById('room-height').value) || 0;
+        const tIn = parseFloat(document.getElementById('temp-in').value) || 0;
+        const tOut = parseFloat(document.getElementById('temp-out').value) || 0;
 
-        // حساب المساحات الأساسية
-        const areaRoof = L * W; // مساحة السقف
-        const areaWalls = (2 * L * H) + (2 * W * H); // مساحة الجدران الأربعة
-        const cltd = tOut - tIn; // فرق درجات الحرارة
+        // 2. جلب سماكة مواد البناء
+        const thkConcrete = parseFloat(document.getElementById('thk-concrete').value) || 0;
+        const thkInsulation = parseFloat(document.getElementById('thk-insulation').value) || 0;
+        const thkCement = parseFloat(document.getElementById('thk-cement').value) || 0;
 
-        // 2. حساب أحمال التوصيل للجدران والسقف
-        // ملاحظة: وضعنا قيمة U مؤقتة (0.5) للتجربة، في التحديث القادم سنربطها بقائمة المواد من data.js
-        const uValueDefault = 0.5;
-        const qRoof = Calculator.calculateTransmissionLoad(uValueDefault, areaRoof, cltd);
-        const qWalls = Calculator.calculateTransmissionLoad(uValueDefault, areaWalls, cltd);
+        const areaRoof = L * W; 
+        const areaWalls = (2 * L * H) + (2 * W * H); 
+        const cltd = tOut - tIn; 
+
+        // 3. بناء طبقات الجدار/السقف للبرنامج لكي يحسبها
+        // نستدعي قيم k من ملف data.js
+        const buildingLayers = [
+            { thickness: thkConcrete, k: materialsData.conc.k },      // الخرسانة (k = 1.23)
+            { thickness: thkInsulation, k: materialsData.poly_s.k }, // العازل (k = 0.029)
+            { thickness: thkCement, k: materialsData.cem.k }         // الأسمنت (k = 0.72)
+        ];
+
+        // 4. حساب U-Value الحقيقي!
+        // معاملات انتقال الحرارة للهواء الداخلي والخارجي (كما في إكسل الدكتور)
+        const ho = 22.7; // هواء خارجي متحرك
+        const hi = 9.37; // هواء داخلي 
+
+        const realUValue = Calculator.calculateUValue(buildingLayers, hi, ho);
+
+        // 5. حساب أحمال التوصيل بالـ U-Value الحقيقي
+        const qRoof = Calculator.calculateTransmissionLoad(realUValue, areaRoof, cltd);
+        const qWalls = Calculator.calculateTransmissionLoad(realUValue, areaWalls, cltd);
         const totalTransmission = qRoof + qWalls;
 
-        // 3. حسابات تجريبية للأحمال الداخلية (بناءً على الأرقام الافتراضية في إكسل الدكتور)
-        // إضاءة: 110 مصباح * 100 وات، 8 ساعات
-        // أشخاص: 150 شخص * 97 وات (مستريح)، 8 ساعات
-        // معدات: 4 معدات * 90 وات، 8 ساعات
+        // 6. الأحمال الداخلية الثابتة (للتجربة)
         const internalLoads = Calculator.calculateInternalLoads(11000, 8, 150, 97, 8, 360, 8);
 
-        // 4. تجميع الأحمال الكلية (مبدئياً)
+        // 7. تجميع الأحمال الكلية
         const totalHeatGain = totalTransmission + internalLoads.total;
-
-        // 5. حساب سعة المنظومة بالطن التبريدي (معامل أمان 10%، تشغيل 24 ساعة)
         const systemCapacity = Calculator.calculateSystemCapacity(totalHeatGain, 10, 24);
 
-        // 6. عرض النتائج على الشاشة في القسم الأيسر
+        // 8. عرض النتائج
         document.getElementById('res-walls').innerText = totalTransmission.toFixed(2) + " W";
-        document.getElementById('res-solar').innerText = "0.00 W"; // سنضيفه لاحقاً
+        document.getElementById('res-solar').innerText = "0.00 W"; 
         document.getElementById('res-internal').innerText = internalLoads.total.toFixed(2) + " W";
-        document.getElementById('res-products').innerText = "0.00 W"; // سنضيفه لاحقاً
-        document.getElementById('res-air').innerText = "0.00 W"; // سنضيفه لاحقاً
+        document.getElementById('res-products').innerText = "0.00 W"; 
+        document.getElementById('res-air').innerText = "0.00 W"; 
 
         document.getElementById('res-total-w').innerText = totalHeatGain.toFixed(2) + " W";
         document.getElementById('res-total-ton').innerText = systemCapacity.tons.toFixed(2) + " TR";
         
-        // تنبيه بسيط للمستخدم أن الحساب تم
-        console.log("تم الحساب بنجاح!");
+        console.log("تم حساب U-Value بنجاح: " + realUValue.toFixed(3));
     });
 });
